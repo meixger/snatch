@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
 namespace Snatch
@@ -31,8 +32,36 @@ namespace Snatch
         File.Copy(source, destination);
       }
 
-      optionsBuilder.UseSqlite($"Data Source={destination}");
+      var cs = new SqliteConnectionStringBuilder { DataSource = destination, Password = AskPassword(destination) }.ToString();
+      var connection = new SqliteConnection(cs);
+      optionsBuilder.UseSqlite(connection);
       base.OnConfiguring(optionsBuilder);
+    }
+
+    private string AskPassword(string destination)
+    {
+        string password;
+        while (true)
+        {
+            try
+            {
+                var pw = new Snatch.Windows.Password();
+                pw.ShowDialog();
+                password = pw.TxtPassword.Password;
+                var cs = new SqliteConnectionStringBuilder { DataSource = destination, Password = password }.ToString();
+                var connection = new SqliteConnection(cs);
+                connection.Open();
+                //var command = connection.CreateCommand();
+                //command.CommandText = "PRAGMA rekey = foobar";
+                //command.ExecuteNonQuery();
+                break;
+            }
+            catch
+            {
+                // ignored
+            }
+        }
+        return password;
     }
   }
 }

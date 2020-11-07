@@ -56,7 +56,7 @@ namespace Snatch
 
     private void RegisterHotkey()
     {
-      KeyGesture ToggleGesture = new KeyGesture(Key.V, ModifierKeys.Control | ModifierKeys.Shift);
+      KeyGesture ToggleGesture = new KeyGesture(Key.Insert, ModifierKeys.Alt | ModifierKeys.Shift);
       HotkeyManager.Current.AddOrReplace("Toggle", ToggleGesture, HandleToggle);
     }
 
